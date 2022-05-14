@@ -2,7 +2,6 @@ local midi = require "lib/midi"
 local class = require "lib/class"
 --local util = require "lib/util"
 
-
 local sleep = sleep or function(i) print("sleep "..tostring(i)) end
 local peripheral = peripheral or {find = function() end}
 local speaker = peripheral.find("speaker") or {playNote = function(...) print("playNote", ...) end}
@@ -81,15 +80,21 @@ function MidiSequencer:linked_callback()
   end
 end
 
-function MidiSequencer:play()
+function MidiSequencer:_find_max_ticks()
   local max = 0
   for k,v in pairs(self.notes) do
     if k > max then
       max = k
     end
   end
+  return max
+end
 
+function MidiSequencer:play()
+
+  local max = self:_find_max_ticks()
   local prev = 1
+  
   for i = 1,max do
     if self.notes[i] then
       sleep(self:_get_sleeptime(i-prev))
